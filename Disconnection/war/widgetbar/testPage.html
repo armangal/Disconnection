@@ -4,7 +4,50 @@
 <script src="integration.js"></script>
 <script type="text/javascript">
 	console.debug("Test page loaded.")
-	var widgetReady = '{\"classId\":1,\"widgetName\":\"Cool Poker\",\"widgetVersion\":\"1.3.55\"}';
+	var widgetReady = '{\"classId\":3,\"widgetName\":\"Cool Poker\",\"widgetVersion\":\"1.3.55\"}';
+	var playerReadyEvent = '{\"classId\":4,\"containerCode\":773672545,\"gameType\":1,\"nickName\":\"kickme\",\"userName\":\"alreadydidit\"}';
+	var playerStatusEvent = '{\"classId\":5,\"containerCode\":773672545,\"playerStatus\":2,\"playerPosition\":2,\"playerBalance\":1134,\"balanceCurrency\":\"USD\"}';
+
+	window.addLog = function(text) {
+		var texta = document.getElementById('texta');
+		 var now    = new Date();
+		 var time   = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+		texta.value = texta.value + "\n"+ time + ":" + text;
+		texta.scrollTop = texta.scrollHeight;
+		
+	}
+	window.handleMessage = function(message) {
+		try {
+			console.debug("Handling message from C++ client:" + message);
+			addLog("Received:" + message);
+	
+			var parsedJSON = eval('('+message+')');
+	
+			var classId=parsedJSON.classId;
+	
+			console.debug('classId='+classId);
+			
+			if (classId == 1) {
+				//send pong
+				sendMessageInter('{\"classId\":2}');
+			}
+		} catch (e) {
+			console.error(e.message);
+		}
+	}
+
+	window.sendMessageInter = function(message) {
+		addLog("Sending:" + message);
+		sendMessage(message);
+	}
+	
+	//simulate receiving ping request
+	window.startPingPong = function() {
+		setTimeout(function sendPing() {
+			handleMessageIntern('{\"classId\":1}');
+			setTimeout(sendPing, 5000);}
+		, 2000);
+	}	
 </script>
 
 <style type="text/css">
@@ -16,6 +59,7 @@
 	border-collapse: collapse;
 	text-align: left;
 }
+
 #infoTable #th {
 	font-size: 14px;
 	font-weight: bold;
@@ -23,18 +67,28 @@
 	border-bottom: 2px solid #6678b1;
 	padding: 10px 8px;
 	background-color: #E0E0E0;
-	text-align: center; 
+	text-align: center;
 }
+
+#infoTable #th th {
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+
+}
+
 #infoTable td {
 	color: #669;
 	padding: 0px 0px 0;
 	border-bottom: 1px solid #ccc;
 	height: 16px;
-}
-#infoTable td#wrapContent {
-	word-wrap:break-word;
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+	padding: 10px;
 }
 
+#infoTable td#wrapContent {
+	word-wrap: break-word;
+}
 
 #infoTable tr:hover td {
 	color: #339;
@@ -45,8 +99,8 @@
 </head>
 
 <body>
-	<p>Widget API Test Page</p>
-	<table id="infoTable" style="width:900px;">
+	<h1>Widget API Test Page</h1>
+	<table id="infoTable" style="width: 900px;">
 		<thead>
 			<tr id="th">
 				<th>Message (classId)</th>
@@ -56,19 +110,41 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>WidgetReady, classId=1</td>
-				<td><pre>{"classId":1,"widgetName":"Cool Poker","widgetVersion":"1.3.55"}</pre></td>
-				<td><button type="button" onclick="sendEvent(widgetReady)">Send
-						WidgetReady</button></td>
+				<td>Ping + Pong (classId=1,2)</td>
+				<td><pre>{"classId":1} and {"classId":2}</pre></td>
+				<td><button type="button"
+						onclick="startPingPong()">Emulate ping/pong</button></td>
 			</tr>
 			<tr>
-				<td>WidgetReady, classId=1</td>
-				<td><pre>{"classId":1,"widgetName":"Cool Poker","widgetVersion":"1.3.55"}</pre></td>
-				<td><button type="button" onclick="sendEvent(widgetReady)">Send
-						WidgetReady</button></td>
+				<td>WidgetReady (classId=3)</td>
+				<td><pre>{"classId":3,"widgetName":"Cool Poker","widgetVersion":"1.3.55"}</pre></td>
+				<td><button type="button"
+						onclick="sendMessageInter(widgetReady)">Send WidgetReady</button></td>
+			</tr>
+			<tr>
+				<td>PlayerDetailsEvent (classId=4)</td>
+				<td><pre>{"classId":4,"containerCode":773672545,"gameType"=1,"nickName"="kickme","userName"="alreadydidit"}</pre></td>
+				<td><button type="button"
+						onclick="handleMessageIntern(playerReadyEvent)">Receive
+						PlayerDetailsEvent</button></td>
+			</tr>
+			<tr>
+				<td>PlayerStattusEvent (classId=5)</td>
+				<td><pre>{"classId":5,"containerCode":773672545,"playerStatus"=2,"playerPosition"=2,"playerBalance"=1134,"balanceCurrency":"USD"}</pre></td>
+				<td><button type="button"
+						onclick="handleMessageIntern(playerStatusEvent)">Receive
+						PlayerStatusEvent</button></td>
 			</tr>
 		</tbody>
 	</table>
+
+	<h2>Logger</h2>
+	<textarea id="texta" rows="30" cols="150" readonly wrap="hard">
+	</textarea>
+	
+	<p>
+	If you have question contact <a href="mailto:arman.gal@playtech.com&subject=Widget API question.">Arman Gal</a>
+	</p>
 
 </body>
 

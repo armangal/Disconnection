@@ -24,18 +24,35 @@ for (var i = 0; i < names.length; ++i){
 }
 
 console.debug ("Integration script is loaded.")
-document.write("<a id='catchMe' href='htcmd:sendEvent?'></a>");
+document.write("<a id='catchMe' href='htcmd:'></a>");
 console.debug ("Integration script, <a> is created.")
 ga('create', 'UA-42857182-1', 'disconstats.appspot.com');
 ga('send', 'pageview');
 
-function sendEvent(event) {
+/**
+ * should be called by widget in order to send message to C++ client
+ * @param message - valid json message
+ */
+function sendMessage(message) {
 	try {
-		console.debug("Sending event to C++ client:" + event);
+		console.debug("Sending message to C++ client:" + message);
 		var a = document.getElementById('catchMe');
-		a.href="htcmd:connStats?event=" + event;
+		a.href="htcmd:sendMessage?message=" + message;
 		a.click();
-		console.debug("HTCMD command is sent");
+		console.debug("HTCMD message is sent.");
+	} catch(e) {
+		console.info(e);
+	}
+}
+
+/**
+ * called by C++ client when message should be sent to widget
+ * @param message - message from C++ client
+ */
+function handleMessageIntern(message) {
+	try {
+		console.debug("Received message from C++ client:" + message);
+		window.handleMessage(message);
 	} catch(e) {
 		console.info(e);
 	}
