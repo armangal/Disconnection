@@ -1,21 +1,20 @@
 package com.pt.pok.client;
 
-import com.pt.pok.shared.FieldVerifier;
+import java.math.BigDecimal;
+
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -24,8 +23,7 @@ public class Disconnection
     implements EntryPoint {
 
     /**
-     * The message displayed to the user when the server cannot be reached or
-     * returns an error.
+     * The message displayed to the user when the server cannot be reached or returns an error.
      */
     private static final String SERVER_ERROR = "An error occurred while " + "attempting to contact the server. Please check your network "
                                                + "connection and try again.";
@@ -39,114 +37,100 @@ public class Disconnection
      * This is the entry point method.
      */
     public void onModuleLoad() {
-        final Button sendButton = new Button("Send");
-        final TextBox nameField = new TextBox();
-        nameField.setText("GWT User");
-        final Label errorLabel = new Label();
 
-        // We can add style names to widgets
-        sendButton.addStyleName("sendButton");
+        JSONObject jsonObj = JSONParser.parseStrict("{\"smallBlind\":1.01}").isObject();
 
-        // Add the nameField and sendButton to the RootPanel
-        // Use RootPanel.get() to get the entire body element
-        RootPanel.get("nameFieldContainer").add(nameField);
-        RootPanel.get("sendButtonContainer").add(sendButton);
-        RootPanel.get("errorLabelContainer").add(errorLabel);
+        RootPanel panel = RootPanel.get();
+        final FlexTable ft = new FlexTable();
+        panel.add(ft);
+        ft.setText(0, 0, "String");
+        ft.setText(0, 1, "Formatted");
+        int i = 1;
+        ft.setText(i, 0, "0.01");
+        ft.setText(i++, 1, format(new BigDecimal("0.01")));
 
-        // Focus the cursor on the name field when the app loads
-        nameField.setFocus(true);
-        nameField.selectAll();
+        ft.setText(i, 0, "0.1");
+        ft.setText(i++, 1, format(new BigDecimal("0.1")));
 
-        // Create the popup dialog box
-        final DialogBox dialogBox = new DialogBox();
-        dialogBox.setText("Remote Procedure Call");
-        dialogBox.setAnimationEnabled(true);
-        final Button closeButton = new Button("Close");
-        // We can set the id of a widget by accessing its Element
-        closeButton.getElement().setId("closeButton");
-        final Label textToServerLabel = new Label();
-        final HTML serverResponseLabel = new HTML();
-        VerticalPanel dialogVPanel = new VerticalPanel();
-        dialogVPanel.addStyleName("dialogVPanel");
-        dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-        dialogVPanel.add(textToServerLabel);
-        dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-        dialogVPanel.add(serverResponseLabel);
-        dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-        dialogVPanel.add(closeButton);
-        dialogBox.setWidget(dialogVPanel);
+        ft.setText(i, 0, "0.10");
+        ft.setText(i++, 1, format(new BigDecimal("0.10")));
 
-        // Add a handler to close the DialogBox
-        closeButton.addClickHandler(new ClickHandler() {
+        ft.setText(i, 0, "1.01");
+        ft.setText(i++, 1, format(new BigDecimal("1.01")));
 
-            public void onClick(ClickEvent event) {
-                dialogBox.hide();
-                sendButton.setEnabled(true);
-                sendButton.setFocus(true);
+        ft.setText(i, 0, "1.11");
+        ft.setText(i++, 1, format(new BigDecimal("1.11")));
+
+        ft.setText(i, 0, "0.11");
+        ft.setText(i++, 1, format(new BigDecimal("0.11")));
+
+        ft.setText(i, 0, "0.0011");
+        ft.setText(i++, 1, format(new BigDecimal("0.0011")));
+
+        ft.setText(i, 0, "1.1111");
+        ft.setText(i++, 1, format(new BigDecimal("1.1111")));
+
+        ft.setText(i, 0, "1.1155");
+        ft.setText(i++, 1, format(new BigDecimal("1.1155")));
+
+        final TextBox text = new TextBox();
+        text.setText("0.01");
+        ft.setWidget(i, 0, text);
+
+        final int row = i;
+        ft.setText(i++, 1, format(new BigDecimal(text.getText())));
+
+        text.addBlurHandler(new BlurHandler() {
+
+            @Override
+            public void onBlur(BlurEvent event) {
+                String jsonString = "{\"smallBlind\":" + text.getText() + "}";
+                Log.debug("jsonString: " + jsonString);
+                ft.setText(row, 1, format(getBigDecimal(JSONParser.parseStrict(jsonString).isObject(), "smallBlind")));
+
             }
         });
 
-        // Create a handler for the sendButton and nameField
-        class MyHandler
-            implements ClickHandler, KeyUpHandler {
+        text.addKeyUpHandler(new KeyUpHandler() {
 
-            /**
-             * Fired when the user clicks on the sendButton.
-             */
-            public void onClick(ClickEvent event) {
-                sendNameToServer();
-            }
-
-            /**
-             * Fired when the user types in the nameField.
-             */
+            @Override
             public void onKeyUp(KeyUpEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    sendNameToServer();
-                }
+                String jsonString = "{\"smallBlind\":" + text.getText() + "}";
+                Log.debug("jsonString: " + jsonString);
+                ft.setText(row, 1, format(getBigDecimal(JSONParser.parseStrict(jsonString).isObject(), "smallBlind")));
+
             }
+        });
 
-            /**
-             * Send the name from the nameField to the server and wait for a response.
-             */
-            private void sendNameToServer() {
-                // First, we validate the input.
-                errorLabel.setText("");
-                String textToServer = nameField.getText();
-                if (!FieldVerifier.isValidName(textToServer)) {
-                    errorLabel.setText("Please enter at least four characters");
-                    return;
-                }
+    }
 
-                // Then, we send the input to the server.
-                sendButton.setEnabled(false);
-                textToServerLabel.setText(textToServer);
-                serverResponseLabel.setText("");
-                greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-
-                    public void onFailure(Throwable caught) {
-                        // Show the RPC error message to the user
-                        dialogBox.setText("Remote Procedure Call - Failure");
-                        serverResponseLabel.addStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(SERVER_ERROR);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
-
-                    public void onSuccess(String result) {
-                        dialogBox.setText("Remote Procedure Call");
-                        serverResponseLabel.removeStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(result);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
-                });
-            }
+    public static BigDecimal getBigDecimal(JSONValue jsonVal, String name) {
+        JSONObject jsonObj = jsonVal.isObject();
+        if (jsonObj == null) {
+            return null;
         }
+        Log.debug("jsonObj:" + jsonObj);
+        String doubleValue = jsonObj.get(name).toString();
+        Log.debug("doubleValue:" + doubleValue);
+        return jsonObj.get(name) != null ? new BigDecimal(doubleValue) : null;
+    }
 
-        // Add a handler to send the name to the server
-        MyHandler handler = new MyHandler();
-        sendButton.addClickHandler(handler);
-        nameField.addKeyUpHandler(handler);
+    public String format(BigDecimal value) {
+        if (value != null) {
+            BigDecimal setScale = value.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+            Log.debug("After setScale:" + setScale);
+            String string = setScale.toPlainString();
+            return "$" + removeTrailingZeros(string);
+        }
+        return " ";
+    }
+
+    private String removeTrailingZeros(String string) {
+        int endIndex = string.length();
+        while (string.charAt( --endIndex) == '0') {}
+        if (Character.isDigit(string.charAt(endIndex))) {
+            endIndex++;
+        }
+        return string.substring(0, endIndex);
     }
 }

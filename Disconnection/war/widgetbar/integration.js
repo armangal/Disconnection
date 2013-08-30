@@ -1,5 +1,7 @@
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+document.oncontextmenu = function() { return false; }
+
 // create a noop console object if the browser doesn't provide one ...
 if (!window.console){
   window.console = {};
@@ -24,8 +26,8 @@ for (var i = 0; i < names.length; ++i){
 }
 
 console.debug ("Integration script is loaded.")
-document.write("<a id='catchMe' href='htcmd:'></a>");
-console.debug ("Integration script, <a> is created.")
+//document.write("<a id='catchMe' href='htcmd:'></a>");
+//console.debug ("Integration script, <a> is created.")
 ga('create', 'UA-42857182-1', 'disconstats.appspot.com');
 ga('send', 'pageview');
 
@@ -36,10 +38,15 @@ ga('send', 'pageview');
 function sendMessage(message) {
 	try {
 		console.debug("Sending message to C++ client:" + message);
-		var a = document.getElementById('catchMe');
-		a.href="htcmd:sendMessage?message=" + message;
-		a.click();
-		console.debug("HTCMD message is sent.");
+		var parsedJSON = eval('('+message+')');
+		console.debug("Sending classId:" + parsedJSON.classId);
+		if ((typeof(parsedJSON.classId) == "undefined") || parsedJSON.classId <= 0) {
+			console.error('Invalid message, skipping. msg=' + message);
+		}
+		//var a = document.getElementById('catchMe');
+		//a.href="htcmd:sendMessage?message=" + message;
+		//a.click();
+		console.warn("Sending to C++ client is not implemented yet.");
 	} catch(e) {
 		console.info(e);
 	}

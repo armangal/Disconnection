@@ -1,6 +1,8 @@
 <html>
 <head>
 <title>Test Page</title>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="integration.js"></script>
 <script type="text/javascript">
 	console.debug("Test page loaded.")
@@ -9,21 +11,20 @@
 	var playerStatusEvent = '{\"classId\":5,\"containerCode\":773672545,\"playerStatus\":2,\"playerPosition\":2,\"playerBalance\":1134,\"balanceCurrency\":\"USD\"}';
 
 	window.addLog = function(text) {
-		var texta = document.getElementById('texta');
-		 var now    = new Date();
-		 var time   = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-		texta.value = texta.value + "\n"+ time + ":" + text;
-		texta.scrollTop = texta.scrollHeight;
-		
+		var texta = $('#texta');
+		var now    = new Date();
+		var time   = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+		texta.val(texta.val() + "\n"+ time + ":" + text);
+		texta.scrollTop(texta[0].scrollHeight);
 	}
+
 	window.handleMessage = function(message) {
 		try {
 			console.debug("Handling message from C++ client:" + message);
 			addLog("Received:" + message);
 	
-			var parsedJSON = eval('('+message+')');
-	
-			var classId=parsedJSON.classId;
+			var parsedJSON = jQuery.parseJSON(message);
+			var classId = parsedJSON.classId;
 	
 			console.debug('classId='+classId);
 			
@@ -98,9 +99,9 @@
 
 </head>
 
-<body>
-	<h1>Widget API Test Page</h1>
-	<table id="infoTable" style="width: 900px;">
+<body style="border: 1px blue solid;margin: 0px;" >
+	<h2>Widget API Test Page</h2>
+	<table id="infoTable" style="width: 100%;">
 		<thead>
 			<tr id="th">
 				<th>Message (classId)</th>
@@ -135,11 +136,17 @@
 						onclick="handleMessageIntern(playerStatusEvent)">Receive
 						PlayerStatusEvent</button></td>
 			</tr>
+			<tr>
+				<td>Just send to Poker Client</td>
+				<td><input type="text" id="openText"></input></td>
+				<td><button type="button"
+						onclick="sendMessageInter($('#openText').val())">Send</button></td>
+			</tr>
 		</tbody>
 	</table>
 
 	<h2>Logger</h2>
-	<textarea id="texta" rows="30" cols="150" readonly wrap="hard">
+	<textarea id="texta" rows="15" cols="150" readonly wrap="hard" style="width: 100%">
 	</textarea>
 	
 	<p>
