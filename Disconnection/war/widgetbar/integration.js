@@ -59,7 +59,11 @@ function sendMessage(message) {
 function handleMessageIntern(message) {
 	try {
 		console.debug("Received message from C++ client:" + message);
-		window.handleMessage(message);
+		var parsedJSON = eval('('+message+')');
+		window.handleMessage({
+	        strMessage: message, 
+	        jsonMessage: parsedJSON
+	    });
 	} catch(e) {
 		console.info(e);
 	}

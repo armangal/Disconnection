@@ -18,12 +18,12 @@
 		texta.scrollTop(texta[0].scrollHeight);
 	}
 
-	window.handleMessage = function(message) {
+	window.handleMessage = function(messageContext) {
 		try {
-			console.debug("Handling message from C++ client:" + message);
-			addLog("Received:" + message);
+			console.debug("Handling message from C++ client:" + messageContext.strMessage);
+			addLog("Received:" + messageContext.strMessage);
 	
-			var parsedJSON = jQuery.parseJSON(message);
+			var parsedJSON = messageContext.jsonMessage;
 			var classId = parsedJSON.classId;
 	
 			console.debug('classId='+classId);
@@ -33,7 +33,7 @@
 				sendMessageInter('{\"classId\":2}');
 			}
 		} catch (e) {
-			console.error(e.message);
+			console.error(e);
 		}
 	}
 
@@ -141,6 +141,14 @@
 				<td><input type="text" id="openText"></input></td>
 				<td><button type="button"
 						onclick="sendMessageInter($('#openText').val())">Send</button></td>
+			</tr>
+
+			<tr>
+				<td>Emo test
+				<button type="button"
+						onclick="window.external.fun('abc')">Send to C++</button></td>
+				<td></td>
+				<td></td>
 			</tr>
 		</tbody>
 	</table>
