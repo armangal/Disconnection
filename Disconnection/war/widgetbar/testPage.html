@@ -111,40 +111,40 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>Ping + Pong (classId=1,2)</td>
+				<td>Ping + Pong (classId=1,2) [From version 2.0]</td>
 				<td><pre>{"classId":1} and {"classId":2}</pre></td>
 				<td><button type="button"
 						onclick="startPingPong()">Emulate ping/pong</button></td>
 			</tr>
 			<tr>
-				<td>WidgetReady (classId=3)</td>
+				<td>WidgetReady (classId=3) [From version 2.0]</td>
 				<td><pre>{"classId":3,"widgetName":"Cool Poker","widgetVersion":"1.3.55"}</pre></td>
 				<td><button type="button"
 						onclick="sendMessageInter(widgetReady)">Send WidgetReady</button></td>
 			</tr>
 			<tr>
-				<td>PlayerDetailsEvent (classId=4)</td>
+				<td>PlayerDetailsEvent (classId=4) [From version 1.0]</td>
 				<td><pre>{"classId":4,"containerCode":773672545,"gameType":1,"nickName":"kickme","userName":"alreadydidit"}</pre></td>
 				<td><button type="button"
 						onclick="handleMessageIntern(playerReadyEvent)">Receive
 						PlayerDetailsEvent</button></td>
 			</tr>
 			<tr>
-				<td>PlayerStattusEvent (classId=5)</td>
+				<td>PlayerStattusEvent (classId=5) [From version 1.0]</td>
 				<td><pre>{"classId":5,"containerCode":773672545,"playerStatus":2,"playerPosition":2,"playerBalance":1134,"balanceCurrency":"USD"}</pre></td>
 				<td><button type="button"
 						onclick="handleMessageIntern(playerStatusEvent)">Receive
 						PlayerStatusEvent</button></td>
 			</tr>
 			<tr>
-				<td>Just send to Poker Client</td>
+				<td>Just send to Poker Client [From version 2.0]</td>
 				<td><input type="text" id="openText"></input></td>
 				<td><button type="button"
 						onclick="sendMessageInter($('#openText').val())">Send</button></td>
 			</tr>
 
 			<tr>
-				<td>Emo test
+				<td>Emo test (ignore)
 				<button type="button"
 						onclick="window.external.fun('abc')">Send to C++</button></td>
 				<td></td>
