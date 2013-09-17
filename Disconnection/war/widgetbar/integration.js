@@ -26,8 +26,8 @@ for (var i = 0; i < names.length; ++i){
 }
 
 console.debug ("Integration script is loaded.")
-//document.write("<a id='catchMe' href='htcmd:'></a>");
-//console.debug ("Integration script, <a> is created.")
+document.write("<a id='catchMe' href='htcmd:'></a>");
+console.debug ("Integration script, <a> is created.")
 ga('create', 'UA-42857182-1', 'disconstats.appspot.com');
 ga('send', 'pageview');
 
@@ -43,10 +43,9 @@ function sendMessage(message) {
 		if ((typeof(parsedJSON.classId) == "undefined") || parsedJSON.classId <= 0) {
 			console.error('Invalid message, skipping. msg=' + message);
 		}
-		//var a = document.getElementById('catchMe');
-		//a.href="htcmd:sendMessage?message=" + message;
-		//a.click();
-		console.warn("Sending to C++ client is not implemented yet.");
+		var a = document.getElementById('catchMe');
+		a.href="htcmd:sendMessage?message=" + message;
+		a.click();
 	} catch(e) {
 		console.info(e);
 	}
